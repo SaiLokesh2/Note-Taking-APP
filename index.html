@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Notes</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-color: #1e1e1e;
+      --text-primary: #ffffff;
+      --text-secondary: #bbbbbb;
+      --accent-color: #ffffff;
+      --delete-color: #ff5555;
+      --edit-color: #55aaff;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+      transition: var(--transition);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .search-container {
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 15px 20px;
+      padding-left: 45px;
+      border-radius: 8px;
+      border: none;
+      background-color: var(--card-color);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+    }
+
+    .search-container i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+    }
+
+    .search-container input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
+
+    .note-input {
+      background-color: var(--card-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .note-input textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 1rem;
+      line-height: 1.5;
+      resize: vertical;
+      transition: var(--transition);
+    }
+
+    .note-input textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .tag-input {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .tag-input input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .tag-input input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    .tag-input button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      background-color: var(--accent-color);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .tag-input button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 6px 12px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      transition: var(--transition);
+    }
+
+    .tag:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .tag i {
+      margin-left: 6px;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+
+    .note-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .note-actions button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .add-note-btn {
+      background-color: var(--accent-color);
+      color: var(--bg-color);
+    }
+
+    .add-note-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .cancel-btn {
+      background-color: transparent;
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cancel-btn:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .note-card {
+      background-color: var(--card-color);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      animation: fadeIn 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .note-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .note-card-content {
+      margin-bottom: 15px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .note-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 15px;
+    }
+
+    .note-card-tag {
+      padding: 4px 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      transition: var(--transition);
+    }
+
+    .note-card-time {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+    }
+
+    .note-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .note-card-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      background-color: rgba(0, 0, 0, 0.2);
+      border: none;
+      transition: var(--transition);
+    }
+
+    .edit-btn:hover {
+      background-color: var(--edit-color);
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background-color: var(--delete-color);
+      color: white;
+    }
+
+    .no-notes {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      background-color: var(--card-color);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .no-notes i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .no-notes h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background-color: var(--card-color);
+      width: 90%;
+      max-width: 600px;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-body textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 1rem;
+      line-height: 1.5;
+      resize: vertical;
+      transition: var(--transition);
+    }
+
+    .modal-body textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-footer button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .save-btn {
+      background-color: var(--accent-color);
+      color: var(--bg-color);
+    }
+
+    .save-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .cancel-modal-btn {
+      background-color: transparent;
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cancel-modal-btn:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+    }
+
+    .note-card.deleting {
+      animation: fadeOut 0.5s ease forwards;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .notes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .note-input {
+        padding: 15px;
+      }
+
+      .tag-container {
+        flex-direction: column;
+      }
+
+      .note-actions button {
+        padding: 10px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Minimal Notes</h1>
+    <p>Simple, elegant note-taking</p>
+  </header>
+
+  <div class="search-container">
+    <i class="fas fa-search"></i>
+    <input type="text" id="search-input" placeholder="Search notes...">
+  </div>
+
+  <div class="note-input">
+    <textarea id="note-textarea" placeholder="Write your note here..."></textarea>
+
+    <div class="tag-container">
+      <div class="tag-input">
+        <input type="text" id="tag-input" placeholder="Add tag (optional)">
+        <button id="add-tag-btn">Add Tag</button>
+      </div>
+      <div class="tags" id="tags-container"></div>
+    </div>
+
+    <div class="note-actions">
+      <button class="cancel-btn" id="cancel-btn">Cancel</button>
+      <button class="add-note-btn" id="add-note-btn">Add Note</button>
+    </div>
+  </div>
+
+  <div class="notes-grid" id="notes-container">
+    <!-- Notes will be added here dynamically -->
+  </div>
+</div>
+
+<!-- Edit Note Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit Note</h3>
+    </div>
+    <div class="modal-body">
+      <textarea id="edit-textarea"></textarea>
+      <div class="tag-container">
+        <div class="tag-input">
+          <input type="text" id="edit-tag-input" placeholder="Add tag (optional)">
+          <button id="edit-add-tag-btn">Add Tag</button>
+        </div>
+        <div class="tags" id="edit-tags-container"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-modal-btn" id="cancel-edit-btn">Cancel</button>
+      <button class="save-btn" id="save-edit-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // DOM Elements
+  const noteTextarea = document.getElementById('note-textarea');
+  const tagInput = document.getElementById('tag-input');
+  const addTagBtn = document.getElementById('add-tag-btn');
+  const tagsContainer = document.getElementById('tags-container');
+  const addNoteBtn = document.getElementById('add-note-btn');
+  const cancelBtn = document.getElementById('cancel-btn');
+  const notesContainer = document.getElementById('notes-container');
+  const searchInput = document.getElementById('search-input');
+
+  // Modal Elements
+  const editModal = document.getElementById('edit-modal');
+  const editTextarea = document.getElementById('edit-textarea');
+  const editTagInput = document.getElementById('edit-tag-input');
+  const editAddTagBtn = document.getElementById('edit-add-tag-btn');
+  const editTagsContainer = document.getElementById('edit-tags-container');
+  const cancelEditBtn = document.getElementById('cancel-edit-btn');
+  const saveEditBtn = document.getElementById('save-edit-btn');
+
+  // Global variables
+  let currentTags = [];
+  let editCurrentTags = [];
+  let editingNoteId = null;
+  let notes = [];
+
+  // Initialize the app
+  function init() {
+    loadNotesFromStorage();
+    renderNotes();
+    setupEventListeners();
+  }
+
+  // Set up event listeners
+  function setupEventListeners() {
+    // Add tag
+    addTagBtn.addEventListener('click', addTag);
+    tagInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTag();
+      }
+    });
+
+    // Add note
+    addNoteBtn.addEventListener('click', addNote);
+    noteTextarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        e.preventDefault();
+        addNote();
+      }
+    });
+
+    // Cancel note
+    cancelBtn.addEventListener('click', cancelNote);
+
+    // Edit modal
+    editAddTagBtn.addEventListener('click', addEditTag);
+    editTagInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addEditTag();
+      }
+    });
+    cancelEditBtn.addEventListener('click', closeEditModal);
+    saveEditBtn.addEventListener('click', saveEditedNote);
+
+    // Search functionality
+    searchInput.addEventListener('input', searchNotes);
+  }
+
+  // Load notes from localStorage
+  function loadNotesFromStorage() {
+    const storedNotes = localStorage.getItem('minimalNotes');
+    if (storedNotes) {
+      notes = JSON.parse(storedNotes);
+    }
+  }
+
+  // Save notes to localStorage
+  function saveNotesToStorage() {
+    localStorage.setItem('minimalNotes', JSON.stringify(notes));
+  }
+
+  // Add a new tag
+  function addTag() {
+    const tagText = tagInput.value.trim();
+    if (tagText && !currentTags.includes(tagText)) {
+      currentTags.push(tagText);
+      renderTags();
+      tagInput.value = '';
+      tagInput.focus();
+    }
+  }
+
+  // Add a new tag in edit mode
+  function addEditTag() {
+    const tagText = editTagInput.value.trim();
+    if (tagText && !editCurrentTags.includes(tagText)) {
+      editCurrentTags.push(tagText);
+      renderEditTags();
+      editTagInput.value = '';
+      editTagInput.focus();
+    }
+  }
+
+  // Render tags
+  function renderTags() {
+    tagsContainer.innerHTML = '';
+    currentTags.forEach((tag, index) => {
+      const tagElement = document.createElement('div');
+      tagElement.className = 'tag';
+      tagElement.innerHTML = `
+                    ${tag}
+                    <i class="fas fa-times" data-index="${index}"></i>
+                `;
+      tagsContainer.appendChild(tagElement);
+
+      // Add event listener to remove tag
+      const removeIcon = tagElement.querySelector('i');
+      removeIcon.addEventListener('click', () => {
+        currentTags.splice(index, 1);
+        renderTags();
+      });
+    });
+  }
+
+  // Render tags in edit mode
+  function renderEditTags() {
+    editTagsContainer.innerHTML = '';
+    editCurrentTags.forEach((tag, index) => {
+      const tagElement = document.createElement('div');
+      tagElement.className = 'tag';
+      tagElement.innerHTML = `
+                    ${tag}
+                    <i class="fas fa-times" data-index="${index}"></i>
+                `;
+      editTagsContainer.appendChild(tagElement);
+
+      // Add event listener to remove tag
+      const removeIcon = tagElement.querySelector('i');
+      removeIcon.addEventListener('click', () => {
+        editCurrentTags.splice(index, 1);
+        renderEditTags();
+      });
+    });
+  }
+
+  // Add a new note
+  function addNote() {
+    const noteText = noteTextarea.value.trim();
+    if (noteText) {
+      const newNote = {
+        id: Date.now().toString(),
+        content: noteText,
+        tags: [...currentTags],
+        createdAt: new Date().toISOString()
+      };
+
+      notes.unshift(newNote); // Add to the beginning of the array
+      saveNotesToStorage();
+      renderNotes();
+      resetNoteInput();
+    }
+  }
+
+  // Reset note input
+  function resetNoteInput() {
+    noteTextarea.value = '';
+    currentTags = [];
+    renderTags();
+  }
+
+  // Cancel creating a note
+  function cancelNote() {
+    resetNoteInput();
+  }
+
+  // Format date
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return date.toLocaleDateString('en-US', options);
+  }
+
+  // Render all notes
+  function renderNotes() {
+    notesContainer.innerHTML = '';
+
+    if (notes.length === 0) {
+      notesContainer.innerHTML = `
+                    <div class="no-notes">
+                        <i class="far fa-sticky-note"></i>
+                        <h3>No notes yet</h3>
+                        <p>Add your first note to get started</p>
+                    </div>
+                `;
+      return;
+    }
+
+    notes.forEach(note => {
+      const noteElement = document.createElement('div');
+      noteElement.className = 'note-card';
+      noteElement.id = `note-${note.id}`;
+
+      const tagsHtml = note.tags.map(tag => `
+                    <div class="note-card-tag">${tag}</div>
+                `).join('');
+
+      noteElement.innerHTML = `
+                    <div class="note-card-content">${note.content}</div>
+                    <div class="note-card-tags">${tagsHtml}</div>
+                    <div class="note-card-time">Created on: ${formatDate(note.createdAt)}</div>
+                    <div class="note-card-actions">
+                        <button class="note-card-btn edit-btn" data-id="${note.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="note-card-btn delete-btn" data-id="${note.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+      notesContainer.appendChild(noteElement);
+
+      // Add event listeners for edit and delete
+      const editBtn = noteElement.querySelector('.edit-btn');
+      const deleteBtn = noteElement.querySelector('.delete-btn');
+
+      editBtn.addEventListener('click', () => openEditModal(note.id));
+      deleteBtn.addEventListener('click', () => deleteNote(note.id));
+    });
+  }
+
+  // Open edit modal
+  function openEditModal(noteId) {
+    const note = notes.find(n => n.id === noteId);
+    if (note) {
+      editingNoteId = noteId;
+      editTextarea.value = note.content;
+      editCurrentTags = [...note.tags];
+      renderEditTags();
+      editModal.classList.add('active');
+    }
+  }
+
+  // Close edit modal
+  function closeEditModal() {
+    editingNoteId = null;
+    editTextarea.value = '';
+    editCurrentTags = [];
+    renderEditTags();
+    editModal.classList.remove('active');
+  }
+
+  // Save edited note
+  function saveEditedNote() {
+    if (editingNoteId) {
+      const noteIndex = notes.findIndex(n => n.id === editingNoteId);
+      if (noteIndex !== -1) {
+        notes[noteIndex] = {
+          ...notes[noteIndex],
+          content: editTextarea.value.trim(),
+          tags: [...editCurrentTags]
+        };
+
+        saveNotesToStorage();
+        renderNotes();
+        closeEditModal();
+      }
+    }
+  }
+
+  // Delete note with animation
+  function deleteNote(noteId) {
+    const noteElement = document.getElementById(`note-${noteId}`);
+    noteElement.classList.add('deleting');
+
+    setTimeout(() => {
+      notes = notes.filter(note => note.id !== noteId);
+      saveNotesToStorage();
+      renderNotes();
+    }, 500);
+  }
+
+  // Search notes
+  function searchNotes() {
+    const searchText = searchInput.value.toLowerCase();
+    const noteElements = document.querySelectorAll('.note-card');
+
+    if (notes.length === 0) return;
+
+    let hasMatches = false;
+
+    notes.forEach(note => {
+      const noteElement = document.getElementById(`note-${note.id}`);
+      const noteContent = note.content.toLowerCase();
+      const noteTags = note.tags.map(tag => tag.toLowerCase());
+
+      const contentMatch = noteContent.includes(searchText);
+      const tagMatch = noteTags.some(tag => tag.includes(searchText));
+
+      if (contentMatch || tagMatch || searchText === '') {
+        noteElement.style.display = 'block';
+        hasMatches = true;
+      } else {
+        noteElement.style.display = 'none';
+      }
+    });
+
+    // Show no results message
+    if (!hasMatches && searchText !== '') {
+      const noResultsExists = document.querySelector('.no-results');
+
+      if (!noResultsExists) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-notes no-results';
+        noResults.innerHTML = `
+                        <i class="fas fa-search"></i>
+                        <h3>No matching notes</h3>
+                        <p>Try a different search term</p>
+                    `;
+        notesContainer.appendChild(noResults);
+      }
+    } else {
+      const noResults = document.querySelector('.no-results');
+      if (noResults) {
+        noResults.remove();
+      }
+    }
+  }
+
+  // Initialize the app
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
